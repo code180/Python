@@ -13,7 +13,7 @@ driver.find_element(
 driver.find_element(
     By.CSS_SELECTOR, "input[name=last-name]").send_keys("Петров")
 driver.find_element(
-    By.CSS_SELECTOR, "input[name=address").send_keys("Ленина, 55-3")
+    By.CSS_SELECTOR, "input[name=address]").send_keys("Ленина, 55-3")
 driver.find_element(
     By.CSS_SELECTOR, "input[name=e-mail]").send_keys("test@skypro.com")
 driver.find_element(
