@@ -24,8 +24,8 @@ def test_shop():
     form.fill_out_form()
 
     total_price = TotalPrice(driver)
-    sum = total_price.total()
+    total_sum = total_price.total()
 
     driver.quit()
 
-    assert sum == "58.29"
+    assert total_sum == "58.29"
