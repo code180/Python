@@ -4,7 +4,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from CalculatorPage import Calculator
 
 
-def test_calcultor():
+def test_calculator():
     driver = webdriver.Chrome(
         service=ChromeService(ChromeDriverManager().install()))
 
