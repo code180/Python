@@ -3,8 +3,9 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 import requests
 
+#Позитивные
 Base_url = 'https://yougile.com/api-v2/'
-
+token = ''
 def test_Login():
 
     User = {
@@ -16,6 +17,14 @@ def test_Login():
     assert YouGile_Login.status_code == 201
     global token
     token = YouGile_Login.json()['key']
+
+def test_список_Проектов():
+    my_headers = {}
+    my_headers['Authorization'] = token
+    YouGile_projects = requests.get(Base_url + "projects", headers=my_headers)
+    projects = YouGile_projects.json
+    assert projects. 
+    
 
 def test_Создание_Проекта():
     project = {
@@ -29,10 +38,17 @@ def test_Создание_Проекта():
 
     YouGile_project = requests.post(
         Base_url+'company', json=project, headers=my_headers)
-    assert YouGile_project.status_code == 201 or 200
 
 
-def test_Получить_список_проектов():
-    YouGile_projects = requests.get(Base_url + "projects")
+def test_Получить_Проект():
+    my_headers = {}
+    my_headers['Authorization'] = token
+    YouGile_projects = requests.get(Base_url + "projects", headers=my_headers)
     projects = YouGile_projects.json
+    first_project = projects[0]
+    assert first_project['name'] == 'python'
 
+def test_изменить_Проект():
+    my_headers = {}
+    my_headers['Authorization'] = token
+    edit_project = requests.get(Base_url + "projects/{id}", headers=my_headers)
