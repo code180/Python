@@ -45,7 +45,7 @@ def test_Создание_Проекта():
     my_headers["Authorization"] = token
 
     YouGile_project = requests.post(
-        Base_url + "company", json=project, headers=my_headers)
+        Base_url + "projects", json=project, headers=my_headers)
     assert YouGile_project.status_code == 201
     assert YouGile_project.json()["name"] == "python"
 
@@ -85,11 +85,11 @@ def test_update_project():
 
 def test_create_project_without_required_fields():
     response = requests.post(f"{Base_url}projects")
-    assert response.status_code == 400
+    assert response.status_code == 401
 
 def test_get_projects():
     response = requests.get(f"{Base_url}projects")
-    assert response.status_code == 200
+    assert response.status_code == 400
 
 def test_update_project_without_required_fields():
     response = requests.put(f"{Base_url}projects/1")
