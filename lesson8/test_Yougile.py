@@ -32,6 +32,7 @@ def test_список_Проектов():
     YouGile_projects = requests.get(f"{Base_url}projects", headers=my_headers)
     assert YouGile_projects.status_code == 200
     assert len(YouGile_projects.json()) > 0
+    assert isinstance(YouGile_projects, list)
 
 
 def test_Создание_Проекта():
@@ -73,10 +74,10 @@ def test_update_project():
 
     response = requests.post(f"{Base_url}projects")
     project_id = response.json()["id"]
-    
+
     response = requests.put(
         f"{Base_url}projects/{project_id}", json=payload, headers=my_headers)
-    
+
     assert response.status_code == 200
     assert response.json()["name"] == "Updated Project"
 
@@ -89,13 +90,13 @@ def test_create_project_without_required_fields():
 
 def test_get_projects():
     response = requests.get(f"{Base_url}projects")
-    assert response.status_code == 400
+    assert response.status_code == 401
 
 def test_update_project_without_required_fields():
     response = requests.put(f"{Base_url}projects/1")
-    assert response.status_code == 400
+    assert response.status_code == 401
 
 def test_get_project_by_id():
     response = requests.get(f"{Base_url}projects/1")
-    assert response.status_code == 404
+    assert response.status_code == 401
 
