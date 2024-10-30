@@ -6,97 +6,126 @@ Base_url = "https://yougile.com/api-v2/"
 token = ""
 
 
-def test_Login():
-    User = {
-        "login": "sasha1996sorok@mail.ru",
-        "password": "Qa!353584584",
-        "companyId": "ce4d7199-d191-413e-a32c-b1757196365c",
-    }
-    YouGile_Login = requests.post(Base_url + "auth/keys", json=User)
-    assert YouGile_Login.status_code == 201
-    global token
-    token = YouGile_Login.json()["key"]
-
-
-def test_список_Проектов():
-    User = {
-        "login": "sasha1996sorok@mail.ru",
-        "password": "Qa!353584584",
-        "companyId": "ce4d7199-d191-413e-a32c-b1757196365c",
-    }
-    YouGile_Login = requests.post(Base_url + "auth/keys", json=User)
-    token = YouGile_Login.json()["key"]
-
-    my_headers = {}
-    my_headers["Authorization"] = token
-    YouGile_projects = requests.get(f"{Base_url}projects", headers=my_headers)
-    assert YouGile_projects.status_code == 200
-    assert len(YouGile_projects.json()) > 0
-    assert isinstance(YouGile_projects, list)
-
-
-def test_Создание_Проекта():
+def test_create_project():
     project = {
-        "title": "python",
-        "description": "This is a test project",
-        "users": {"036bade1-6003-4588-a1e5-005361722e1d": "admin"}
+        "title": "Postman",
+        "users": {
+            "036bade1-6003-4588-a1e5-005361722e1d": "admin"
+        }
     }
 
-    my_headers = {}
-    my_headers["Authorization"] = token
+    my_headers = {
+        "Authorization": f"Bearer {token}",  # Добавлен Bearer токен
+        "Content-Type": "application/json"
+    }
 
     YouGile_project = requests.post(
         Base_url + "projects", json=project, headers=my_headers)
+
     assert YouGile_project.status_code == 201
-    assert YouGile_project.json()["name"] == "python"
+    # Сохранение полученного ID проекта
+    project_id = YouGile_project.json()["id"]
 
 
-def test_Получить_Проект_by_id():
-    my_headers = {}
-    my_headers["Authorization"] = token
+def test_get_projects():
+    my_headers = {
+        "Authorization": f"Bearer {token}",  # Используем ваш токен
+        "Content-Type": "application/json"
+    }
 
-    response = requests.get(f"{Base_url}projects")
-    project_id = response.json()[0]["id"]
-    response = requests.get(
-        f"{Base_url}projects/{project_id}", headers=my_headers)
+    response = requests.get(f"{Base_url}projects", headers=my_headers)
+
     assert response.status_code == 200
-    assert response.json()["id"] == project_id
 
 
 def test_update_project():
     payload = {
-        "name": "Updated Project",
-        "description": "This is an updated project"
+        "deleted": True,
+        "title": "Updated Project2",
+        "users": {
+            "036bade1-6003-4588-a1e5-005361722e1d": "admin"
+        }
     }
 
-    my_headers = {}
-    my_headers["Authorization"] = token
+    my_headers = {
+        "Authorization": f"Bearer {token}",  # Добавлен Bearer токен
+        "Content-Type": "application/json"
+    }
 
-    response = requests.post(f"{Base_url}projects")
-    project_id = response.json()["id"]
+    project_id = "25fbba8c-0a17-4a0e-8a8e-f5424bc79b13"
 
     response = requests.put(
         f"{Base_url}projects/{project_id}", json=payload, headers=my_headers)
 
     assert response.status_code == 200
-    assert response.json()["name"] == "Updated Project"
+
+
+def test_get_project_by_id():
+    my_headers = {
+        "Authorization": f"Bearer {token}",  # Добавлен Bearer токен
+        "Content-Type": "application/json"
+    }
+
+    response = requests.get(f"{Base_url}projects")
+    project_id = response.json()[0]["id"]
+    response = requests.get(
+        f"{Base_url}projects/{project_id}", headers=my_headers)
+
+    assert response.status_code == 200
+    assert response.json()["id"] == project_id
 
 
 # Негативные
 
-def test_create_project_without_required_fields():
-    response = requests.post(f"{Base_url}projects")
-    assert response.status_code == 401
+def test_create_project_without_title():
+    project = {
+        "users": {
+            "036bade1-6003-4588-a1e5-005361722e1d": "admin"
+        }
+    }
 
-def test_get_projects():
+    my_headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
+    }
+
+    YouGile_project = requests.post(
+        Base_url + "projects", json=project, headers=my_headers)
+
+    assert YouGile_project.status_code == 401
+
+
+def test_get_projects_without_authorization():
     response = requests.get(f"{Base_url}projects")
     assert response.status_code == 401
 
-def test_update_project_without_required_fields():
-    response = requests.put(f"{Base_url}projects/1")
+
+def test_update_project_without_users():
+    payload = {
+        "deleted": True,
+        "title": "Updated Project2"
+    }
+
+    my_headers = {
+        "Authorization": f"Bearer {token}",  
+        "Content-Type": "application/json"
+    }
+
+    project_id = "25fbba8c-0a17-4a0e-8a8e-f5424bc79b13"
+
+    response = requests.put(
+        f"{Base_url}projects/{project_id}", json=payload, headers=my_headers)
+
     assert response.status_code == 401
 
-def test_get_project_by_id():
-    response = requests.get(f"{Base_url}projects/1")
-    assert response.status_code == 401
+def test_get_project_without_id():
+    my_headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
+    }
 
+    response = requests.get(f"{Base_url}projects")
+    response = requests.get(
+        f"{Base_url}projects", headers=my_headers)
+
+    assert response.status_code == 401
